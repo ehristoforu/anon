@@ -50,8 +50,8 @@ export const ChatWidget = ({ username, seedPhrase, onLogout }: Props): JSX.Eleme
 
   useEffect(() => {
     void sync().catch((syncError: unknown) => {
-      const text = syncError instanceof Error ? syncError.message : 'Unable to sync';
-      setError(text.includes('decrypt') ? 'Invalid seed phrase for this room.' : text);
+      const text = syncError instanceof Error ? syncError.message : 'Не удалось синхронизировать сообщения';
+      setError(text.includes('decrypt') ? 'Неверная seed-фраза для этой комнаты.' : text);
       setLoading(false);
     });
   }, [sync]);
@@ -84,7 +84,7 @@ export const ChatWidget = ({ username, seedPhrase, onLogout }: Props): JSX.Eleme
         const decrypted = await decryptBatch(nextDoc.messages, seedPhrase);
         setMessages(decrypted);
       } catch (sendError) {
-        const textMessage = sendError instanceof Error ? sendError.message : 'Unable to send message';
+        const textMessage = sendError instanceof Error ? sendError.message : 'Не удалось отправить сообщение';
         setError(textMessage);
       }
     },
@@ -94,24 +94,26 @@ export const ChatWidget = ({ username, seedPhrase, onLogout }: Props): JSX.Eleme
   const ordered = useMemo(() => [...messages].sort((a, b) => a.createdAt - b.createdAt), [messages]);
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-3xl flex-col">
-      <header className="flex items-center justify-between border-b border-zinc-800 p-3">
-        <div>
-          <h2 className="text-lg font-semibold">Anonymous room</h2>
-          <p className="text-xs text-zinc-400">{username}</p>
+    <div className="mx-auto flex h-screen w-full max-w-4xl flex-col px-2 py-2 sm:px-4 sm:py-4">
+      <div className="anim-fade-up flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
+        <header className="flex items-center justify-between border-b border-zinc-800 px-3 py-3 sm:px-5">
+          <div>
+            <h2 className="text-base font-bold sm:text-lg">Анонимная комната</h2>
+            <p className="text-xs text-zinc-400">Пользователь: {username}</p>
+          </div>
+          <button className="rounded-xl border border-zinc-700 px-3 py-2 text-xs text-zinc-200 transition hover:border-zinc-500" onClick={onLogout} type="button">
+            Выйти
+          </button>
+        </header>
+        {error ? <div className="border-b border-red-900 bg-red-950/40 px-3 py-2 text-xs text-red-300">{error}</div> : null}
+        <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-3 py-3 sm:px-5">
+          {loading ? <p className="text-sm text-zinc-500">Синхронизация сообщений...</p> : null}
+          {ordered.map((message) => (
+            <MessageItem key={message.id} message={message} isOwn={message.sender === username} />
+          ))}
         </div>
-        <button className="text-xs text-zinc-300" onClick={onLogout} type="button">
-          Logout
-        </button>
-      </header>
-      {error ? <div className="border-b border-red-900 bg-red-950/40 p-2 text-xs text-red-300">{error}</div> : null}
-      <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto p-3">
-        {loading ? <p className="text-sm text-zinc-500">Syncing...</p> : null}
-        {ordered.map((message) => (
-          <MessageItem key={message.id} message={message} isOwn={message.sender === username} />
-        ))}
+        <MessageComposer onSend={send} />
       </div>
-      <MessageComposer onSend={send} />
     </div>
   );
 };

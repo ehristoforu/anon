@@ -24,11 +24,11 @@ const headers = {
 
 const ensureResponse = async (response: Response): Promise<Response> => {
   if (response.status === 403) {
-    throw new Error('Rate limit reached. Please wait and retry.');
+    throw new Error('Превышен лимит GitHub API. Подождите и повторите попытку.');
   }
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(text || 'GitHub API request failed');
+    throw new Error(text || 'Ошибка запроса к GitHub API');
   }
   return response;
 };

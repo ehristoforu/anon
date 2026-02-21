@@ -22,15 +22,15 @@ export const MessageComposer = ({ onSend }: Props): JSX.Element => {
   };
 
   return (
-    <div className="border-t border-zinc-800 bg-black p-3">
+    <div className="border-t border-zinc-800 bg-black/80 p-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] sm:p-3">
       {showPicker ? (
-        <div className="mb-2 overflow-hidden rounded-xl border border-zinc-700">
+        <div className="mb-2 overflow-hidden rounded-2xl border border-zinc-700">
           <EmojiPicker onEmojiClick={(emojiData) => setValue((prev) => `${prev}${emojiData.emoji}`)} lazyLoadEmojis />
         </div>
       ) : null}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <button
-          className="rounded-xl border border-zinc-700 px-3"
+          className="h-11 rounded-2xl border border-zinc-700 px-3 text-lg transition hover:border-zinc-500"
           onClick={() => setShowPicker((prev) => !prev)}
           type="button"
         >
@@ -44,11 +44,11 @@ export const MessageComposer = ({ onSend }: Props): JSX.Element => {
               void submit();
             }
           }}
-          className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm outline-none"
-          placeholder="Message"
+          className="h-11 flex-1 rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-sm outline-none transition focus:border-zinc-600"
+          placeholder="Напишите сообщение"
         />
-        <Button onClick={() => void submit()} disabled={sending || !value.trim()}>
-          Send
+        <Button onClick={() => void submit()} disabled={sending || !value.trim()} className="h-11 px-4 py-0">
+          Отправить
         </Button>
       </div>
     </div>
